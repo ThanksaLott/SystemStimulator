@@ -22,6 +22,8 @@ class model():
             "V12m":-30,
             "km":7
             }
+        
+        self.initdim = 2
 
     
     # BaseStim=98.01, n_T=300, delT=0.01,gl=1, El=-78, 
@@ -51,10 +53,12 @@ class model():
         dydt = np.array((dV, dn, dIapp))
         return dydt
     
-    def nullclines(self, Stim):
+    def nullclines(self, y):
         """Computes nullclines, solved by n by setting V in a range"""
+        V, n, Iapp = y
+        
         Vrange = np.linspace(-89,20, 500)
-        NulcV = ((Stim-self.Ileak(Vrange)-self.Ina(Vrange))
+        NulcV = ((Iapp-self.Ileak(Vrange)-self.Ina(Vrange))
                  /(self.params["gk"]*(Vrange-self.Ek)))
         #NulcN = (1/(1+np.exp((V12n-Vrange)/kn)))\
         NulcN = self.ninf(Vrange)

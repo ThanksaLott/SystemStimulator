@@ -93,14 +93,13 @@ class Stimulator():
             if tp == 0:
                 solve = scipy.integrate.RK45(self.equations, tp, X_init, tp+1, max_step = self.delT)
             else:
-                X_init = np.array([solve.y[0], solve.y[1], self.Stimulus[tp]])
+                X_init = solve.y #np.array([solve.y[0], solve.y[1], self.Stimulus[tp]])
+                X_init[-1] = self.Stimulus[tp]
                 solve = scipy.integrate.RK45(self.equations, tp, X_init, tp+1, max_step = self.delT)
             while solve.status == 'running':
                 solve.step()
                 ys.append(solve.y)
                 ts.append(solve.t)
-                # print("y = " + b.ystr(b.y))
-                # print("t = " + str(b.t))
         self.ys = np.array(ys)
         self.stims = self.ys[:,self.ys.shape[1]-1]
         self.ts = np.array(ts)

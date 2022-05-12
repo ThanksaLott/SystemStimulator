@@ -11,9 +11,9 @@ GS d- s:+ a-- C++ t 5 X R tv b+ D+ G e+++ h r++
 
 import os
 
-model2load = "I_Nap-I_K"
-init = [-44.3195622 , 0.53396948]
-PulseInstr = [0,0,0,0,0]# [120,15,5,10,3]
+model2load =  "ToggleSwitch" #"I_Nap-I_K"
+init = [0,0,0] #[0.0, 0.1, 0.5, 0.0, 0.0, 0.1] #[-44.3195622 , 0.53396948]
+PulseInstr = [0,0,0,0,0] #[1,50,5,10,3]# [120,15,5,10,3]
 BaseStim = 0
 
 cwd = os.getcwd()
@@ -34,5 +34,8 @@ model = mod.model()
 print(model.params)
 
 from Stimulator import Stimulator
-a = Stimulator(model, BaseStim, PulseInstr, init)
-a.TimeSeries()
+simu = Stimulator(model, BaseStim, PulseInstr, init, n_T = 1500)
+simu.TimeSeries()
+
+
+# EGFRp, RGa, RJa, EGFEGFRp, EGFEGFR, N2a, EGF = y
