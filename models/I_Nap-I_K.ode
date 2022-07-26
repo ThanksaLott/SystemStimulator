@@ -1,0 +1,35 @@
+# Izhikevich book - I_Na,p-I_K model
+
+# initial conditions
+init V1 = 0.1, n1 = 0.1
+
+# equations
+dV1/dt = (Iapp - (Ileak(V1) + Ina(V1) + Ik(V1,n1)))/C
+dn1/dt = (ninf(V1)-n1)/tau(V1)
+
+# where
+Ileak(V) = gl*(V-El)
+Ina(V) = gna*minf(V)*(V-Ena)
+Ik(V,n) = gk*n*(V-Ek)
+ninf(V) = 1/(1+exp((V12n-V)/kn))
+minf(V) = 1/(1+exp((V12m-V)/km))
+tau(V) = 1 
+#tau(V) = Cbase + Camp*exp(-(Vmax-V)^2/(sigma^2))
+
+# parameters
+param gl=1, El=-78, gna=2.7, Ena=60, gk=4, Ek=-90, C=1, Iapp=98.02
+param V12n=-45, kn=5, V12m=-30, km=7, Cbase, Camp, Vmax, sigma
+#param V12n=-59.989875, kn=5, V12m=-49.6, km=7, Cbase, Camp, Vmax, sigma # param that sent to Aneta bif_close to zero
+#param V12n=-56.02802558, kn=5, V12m=-47.5, km=7, Cbase, Camp, Vmax, sigma
+#param V12n=-60, kn=5, V12m=-47.5, km=7, Cbase, Camp, Vmax, sigma
+
+@ meth=cvode,dt=0.2,total=2000,maxstor=100
+@ xp=V1,yp=n1,bound=1000
+@ xlo=-90,xhi=20,ylo=-0.2,yhi=1.2
+​
+# Some AUTO parameters
+@ autovar=Iapp,autoxmin=0,autoymin=-100,autoxmax=500,autoymax=20
+@ ntst=400,nmax=2500,npr=500,ds=0.001,dsmin=0.0001,dsmax=0.05
+@ ncol=4,epsl=1e-4,parmin=0,parmax=200,normmin=0,normmax=1000
+@ epsu=1e-4,epss=0.0001
+done

@@ -22,8 +22,13 @@ class model():
             "V12m":-30,
             "km":7
             }
-        
+        self.initdefault = [-44.43651909,   0.52814426]    
         self.initdim = 2
+        self.ylabels = ["V", "n", "Iapp"]
+        self.criticality = 98.01
+        self.climbingpulse = [110.5, 10, 2, 4, 2]
+        self.initdim = 4
+        self.ylabels = ["V", "m_Ca", "m_K", "h_K", "Iapp"]
 
     
     # BaseStim=98.01, n_T=300, delT=0.01,gl=1, El=-78, 
@@ -47,8 +52,8 @@ class model():
     def equations(self, t, y):
         V, n, Iapp = y
         
-        dV = (Iapp - self.Ileak(V) - self.Ina(V) - self.Ik(V,n))/self.params["C"]
-        dn = (self.ninf(V) - n)/self.tau(V)
+        dV = (Iapp - self.Ileak(V) - self.Ina(V) - self.Ik(V,n))/self.params["C"]#+np.random.randn()
+        dn = (self.ninf(V) - n)/self.tau(V)+0.05*np.random.randn()
         dIapp = 0
         dydt = np.array((dV, dn, dIapp))
         return dydt

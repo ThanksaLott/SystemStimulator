@@ -1,0 +1,36 @@
+# From https://hal.archives-ouvertes.fr/hal-03351604/document
+
+# initial conditions
+#init V = -44.437, mCa = 0.307, mK = 0, hK = 0.993
+init V = -36.377, mCa = 0.36992, mK = 0, hK = 0.96281
+
+# equations
+dV/dt = (-gCa*mCa*(V-ECa)-gKir*hKirinf(V)*(V-EK)-gK*mK*hK*(V-EK)-gL*(V-EL)+Iapp)/C
+dmCa/dt = (mCainf(V)-mCa)/taumCa
+dmK/dt = (mKinf(V)-mK)/taumK
+dhK/dt = (hKinf(V)-hK)/tauhK
+
+# where
+hKirinf(V) = 1/(1+exp((VhKir-V)/khKir))
+mCainf(V) = 1/(1+exp((VmCa-V)/kmCa))
+mKinf(V) = 1/(1+exp((VmK-V)/kmK))
+hKinf(V) = 1/(1+exp((VhK-V)/khK))
+
+#parameters
+param gCa=0.24, gKir=0.332, gK=0.127, gL=0.28, ECa=105.3, EK=-100
+param EL=-81.3,VmCa=-21.04, VhCa=0, VhKir=-89.99, VmK=-17.7
+param VhK=-21.28, kmCa=28.8, khCa=0, khKir=-1.2, kmK=1.18, khK=-4.64
+param taumCa=0.16, tauhCa=0, taumK=0.2, tauhK=5.08, m0Ca=0.349, h0Ca=0
+param m0K=0.79, h0K=0.13, C=0.02, Iapp = 0
+
+@ dt=0.0001,total=10,maxstor=10
+@ xp=T,yp=V,bound=10000
+@ xlo=0,xhi=100,ylo=-50,yhi=30
+
+# Some AUTO parameters
+@ autovar=Iapp,autoxmin=0.0,autoymin=-40,autoxmax=30,autoymax=40
+@ ntst=400,nmax=2500,npr=500,ds=0.001,dsmin=0.0001,dsmax=0.05
+@ ncol=4,epsl=1e-4,parmin=0,parmax=30,normmin=0,normmax=1000
+@ epsu=1e-4,epss=0.0001
+
+done

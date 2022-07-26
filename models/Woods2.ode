@@ -1,0 +1,24 @@
+# initial conditions
+init Ca=0, Ro=0, Rcl=1, Rcs=0
+
+# parameters
+par k_in=6, k_out=0.03, k_open=0.1, k_close=0.1, k_shutclos=0.4, k_shutopen=0.2, ContractTh=6, Stim=0
+
+# equations
+dCa/dt = k_in*Ro - Ca*k_out
+dRo/dt = k_open*Stim*Rcl - k_close*Ro
+dRcl/dt = (k_close*Ro + Rcs*k_shutopen - k_open*Stim*Rcl -k_shutclos*Rcl*exp(Ca-ContractTh))
+dRcs/dt = exp(Ca-ContractTh)*Rcl*k_shutclos - Rcs*k_shutopen
+
+
+
+@ meth=cvode,dt=0.2,total=2000,maxstor=100
+@ xp=T,yp=Ca,bound=1000
+@ xlo=0,xhi=200,ylo=-0.2,yhi=6
+​
+# Some AUTO parameters
+@ autovar=Stim,autoxmin=0.0,autoymin=0.0,autoxmax=2,autoymax=1
+@ ntst=400,nmax=2500,npr=500,ds=0.001,dsmin=0.0001,dsmax=0.05
+@ ncol=4,epsl=1e-4,parmin=0,parmax=200,normmin=0,normmax=1000
+@ epsu=1e-4,epss=0.0001
+done
