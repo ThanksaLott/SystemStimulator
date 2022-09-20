@@ -1,6 +1,6 @@
 __pycache__/
 .spyproject
-/models/*
-!models/TwoCompartment.ode
+/models/
+# !models/TwoCompartment.ode
 
 /Plots/*
