@@ -14,13 +14,14 @@ from ParseODE import ParseODE
 from Integrators import SingleStepIntegrator
 
 model2load =  "xpp-two_compartment_mod" # Name of the .ode file
+model2load = "TwoCompartment"
 init = "default" # initial conditions, "default" for inits specified in .ode
 
-StimulusInstr = [0,0.2,1000,6000,6000,14] # Stimulus train
+StimulusInstr = [0,0.2,1000,6000,6000,1] # Stimulus train
 # Follows the scheme of [basal, strength, start, length, interpulse, repeats]
 
 StimulusParameter = "EGF" # Name of the parameter for stimulus
-n_TPs = 2000 # Amount of timepoints on which simulation is performed
+n_TPs = 200000 # Amount of timepoints on which simulation is performed
 
 cwd = os.getcwd()
 modellist = [fn[:-4] for fn in os.listdir(os.path.join(cwd, "models"))
@@ -114,15 +115,21 @@ def PhaseSpace2D(Xvariable, Yvariable, start = 0, end = -1, interval = 50):
 # plt.plot(Sim.valdict["t"][1:], Sim.Stimulus[StimulusParameter], "k", label = StimulusParameter)
 
 #%% Plotting for EGFR 2 compartment
-TimeSeries("EGFRp_pm")
-TimeSeries("EGFR_cyt")
-PhaseSpace2D('EGFRp_pm', 'PTPRGa_pm')
+# TimeSeries("EGFRp_pm")
+# TimeSeries("EGFR_cyt")
+# PhaseSpace2D('EGFRp_pm', 'PTPRGa_pm')
 
-EGFRtotal_pm = np.array(Sim.valdict["EGFRp_pm"])+np.array(Sim.valdict["EGFR_pm"])+np.array(Sim.valdict["EEGFRp_pm"])
-EGFRtotal = EGFRtotal_pm + np.array(Sim.valdict["EGFR_cyt"])+np.array(Sim.valdict["EGFRp_cyt"])
-plt.plot(EGFRtotal)
-plt.plot(EGFRtotal_pm)
+# EGFRtotal_pm = np.array(Sim.valdict["EGFRp_pm"])+np.array(Sim.valdict["EGFR_pm"])+np.array(Sim.valdict["EEGFRp_pm"])
+# EGFRtotal = EGFRtotal_pm + np.array(Sim.valdict["EGFR_cyt"])+np.array(Sim.valdict["EGFRp_cyt"])
+# plt.plot(Sim.valdict["t"]/60, EGFRtotal)
+# plt.plot(EGFRtotal_pm)
 #%% Plotting for the Two Compartment model
+
+TimeSeries("RPMa")
+Rtotalpm = np.array(Sim.valdict["RPMa"]) + np.array(Sim.valdict["RPMi"]) + np.array(Sim.valdict["LRPM"])
+Rtotal = Rtotalpm + np.array(Sim.valdict["REa"]) + np.array(Sim.valdict["REi"]) + np.array(Sim.valdict["LREi"])
+plt.plot(Rtotal)
+plt.plot(Rtotalpm)
 
 # plt.figure()
 # plt.plot(Sim.valdict["t"], Sim.valdict["RPMa"])
