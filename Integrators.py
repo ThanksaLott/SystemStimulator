@@ -31,6 +31,10 @@ class SingleStepIntegrator():
         self.RunSimulation()
         
     def UnpackStimulus(self):
+        """
+        Writes the individual items in stimulus instruction list as individual 
+        variables, so the code is more readable.
+        """
         self.Stimulus_base = self.StimulusInstr[0]
         self.Stimulus_strength = self.StimulusInstr[1]
         self.Stimulus_start = self.StimulusInstr[2]
@@ -63,8 +67,22 @@ class SingleStepIntegrator():
         return {self.StimulusParameter: Stimulus}
     
     def GenerateValDict(self, tstart = 0):
+        """
+        Generates a dictionary to hold the values gained in the simulation.
+
+        Parameters
+        ----------
+        tstart : float, optional
+            Parameter in case simulation starts later. The default is 0.
+
+        Returns
+        -------
+        valdict : dict
+            Dictionary of time, tp, stimulus parameter and all values.
+
+        """
         valdict = {"tp": [0],
-               "t" : [0],
+               "t" : [tstart],
                self.StimulusParameter: [0]}
         for key in self.initdict.keys():
             valdict[key] = [self.initdict[key]]
@@ -89,42 +107,42 @@ class SingleStepIntegrator():
             subseqs[eqkey] = eq
         return subseqs
 
-    def BetterReplace(self):
-        """
-        Inserts values into equation.
-        This function is deprecated, please use EvenBetterReplace for running
-        the simulation as it is way more efficient.
+    # def BetterReplace(self):
+    #     """
+    #     Inserts values into equation.
+    #     This function is deprecated, please use EvenBetterReplace for running
+    #     the simulation as it is way more efficient.
 
-        Returns
-        -------
-        subseqs : dict
-            Dictionary of value name and equation, where values are placed.
+    #     Returns
+    #     -------
+    #     subseqs : dict
+    #         Dictionary of value name and equation, where values are placed.
 
-        """
-        subseqs = {}
-        for eqkey in self.diffeqdict.keys():
-            eq = self.diffeqdict[eqkey]
-            for valkey in self.valdict.keys():
-                value = self.valdict[valkey][-1]
-                start = 0
-                while start < len(eq):
-                    pos = eq.find(valkey, start)
-                    if pos < 0: break
-                    start = pos
-                    front, back = False, False
-                    if any(symb in  eq[pos-1]  for symb in ["+", "-", "*", "/", "("]):
-                        front = True
-                    try:
-                        if any(symb in  eq[pos+len(str(valkey))]  for symb in ["+", "-", "*", "/", ")"]):
-                            back = True
-                    except IndexError:
-                        back = True
-                    if front and back:
-                        eq = self.ReplaceAtPos(eq, pos, valkey, str(value))
-                        start+=len(str(value))
-                    else: start += 1
-            subseqs[eqkey] = eq
-        return subseqs
+    #     """
+    #     subseqs = {}
+    #     for eqkey in self.diffeqdict.keys():
+    #         eq = self.diffeqdict[eqkey]
+    #         for valkey in self.valdict.keys():
+    #             value = self.valdict[valkey][-1]
+    #             start = 0
+    #             while start < len(eq):
+    #                 pos = eq.find(valkey, start)
+    #                 if pos < 0: break
+    #                 start = pos
+    #                 front, back = False, False
+    #                 if any(symb in  eq[pos-1]  for symb in ["+", "-", "*", "/", "("]):
+    #                     front = True
+    #                 try:
+    #                     if any(symb in  eq[pos+len(str(valkey))]  for symb in ["+", "-", "*", "/", ")"]):
+    #                         back = True
+    #                 except IndexError:
+    #                     back = True
+    #                 if front and back:
+    #                     eq = self.ReplaceAtPos(eq, pos, valkey, str(value))
+    #                     start+=len(str(value))
+    #                 else: start += 1
+    #         subseqs[eqkey] = eq
+    #     return subseqs
 
     def ReplaceAtPos(self, string:str, pos:int, remove:str, insert:str):
         """
@@ -155,15 +173,15 @@ class SingleStepIntegrator():
             
         return string[:pos] + str(insert) + string[pos+len(str(remove)):]
 
-    def EvaluateEQs(self):
-        # subseqs = self.InsertVals()
-        subseqs = self.BetterReplace()
-        for key in subseqs.keys():
-            self.valdict[key].append(self.valdict[key][-1]+self.dt*eval(subseqs[key]))
-        self.valdict["tp"].append(self.valdict["tp"][-1] + 1)
-        self.valdict["t"].append(self.valdict["t"][-1] + self.dt)
-        # self.valdict = valdict
-        # return valdict
+    # def EvaluateEQs(self):
+    #     # subseqs = self.InsertVals()
+    #     subseqs = self.BetterReplace()
+    #     for key in subseqs.keys():
+    #         self.valdict[key].append(self.valdict[key][-1]+self.dt*eval(subseqs[key]))
+    #     self.valdict["tp"].append(self.valdict["tp"][-1] + 1)
+    #     self.valdict["t"].append(self.valdict["t"][-1] + self.dt)
+    #     # self.valdict = valdict
+    #     # return valdict
 
     def EvenBetterReplace(self):
         subseqs = {}
@@ -193,22 +211,50 @@ class SingleStepIntegrator():
         return subseqs
 
     def BetterEvaluateEQs(self):
+        """
+        Loops over the equations and solves them for the next time step.
+        Results are saved in self.valdict.
+
+        Returns
+        -------
+        None.
+
+        """
         for key in self.subseqs.keys():
             self.valdict[key].append(self.valdict[key][-1]+self.dt*eval(self.subseqs[key]))
         self.valdict["tp"].append(self.valdict["tp"][-1] + 1)
         self.valdict["t"].append(self.valdict["t"][-1] + self.dt)
     
     def SingleStep(self):
+        """
+        Performs a single integration step and prints results.
+        Needed that for testing.
+        """
+        
         for key in self.subseqs.keys():
             print(self.valdict[key][-1]+self.dt*eval(self.subseqs[key]))
     
     def RunSimulation(self):
+        """
+        Does the ODE solving in a loop until last TP is reached.
+        Values are saved in the self.valdict dictionary.
+        """
         while self.valdict["tp"][-1] < self.n_TPs:
             self.valdict[self.StimulusParameter][-1] = self.Stimulus[self.StimulusParameter][self.valdict["tp"][-1]]
             # self.EvaluateEQs()
             self.BetterEvaluateEQs()
             
     def PrintLast(self):
+        """
+        Prints the the values at the last timepoint. 
+        Good for getting new initial values, e.g being closer to steady state.
+
+        Returns
+        -------
+        string: str
+            String of values at the last timepoint. Is also printed out.
+
+        """
         string = "init "
         count = 0
         for key in self.valdict.keys():
@@ -218,6 +264,7 @@ class SingleStepIntegrator():
             string += (key + "=" + str(round(self.valdict[key][-1],3)))
             count += 1
         print(string)
+        return string
             # print(key + " " +str(round(self.valdict[key][-1],3)))
 
 

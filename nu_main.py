@@ -10,13 +10,14 @@ import os
 from ParseODE import ParseODE
 from Integrators import SingleStepIntegrator
 
-model2load =  "xpp-two_compartment_mod" #"ToggleSwitch" #"I_N ap-I_K"
-init = "default" #[-5.17624, 0.633831, 0.999974, 0.0650542]#"default" #[-16.54556821, 0.53893609, 0.72679945, 0.2646773] # #[0,0,1,0] #[0.0, 0.1, 0.5, 0.0, 0.0, 0.1] #[-44.3195622 , 0.53396948]
+model2load =  "xpp-two_compartment_mod" # Name of the .ode file
+init = "default" # initial conditions, "default" for inits specified in .ode
 
-StimulusInstr = [0,0.2,1000,6000,6000,14]#[0,0.2926,100,1000,500,2]
-# StimulusInstr = [0,1,1000,6000,500,1]
-StimulusParameter = "EGF"
-n_TPs = 200000
+StimulusInstr = [0,0.2,1000,6000,6000,14] # Stimulus train
+# Follows the scheme of [basal, strength, start, length, interpulse, repeats]
+
+StimulusParameter = "EGF" # Name of the parameter for stimulus
+n_TPs = 200000 # Amount of timepoints on which simulation is performed
 
 cwd = os.getcwd()
 modellist = [fn[:-4] for fn in os.listdir(os.path.join(cwd, "models"))
