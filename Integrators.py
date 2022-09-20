@@ -57,7 +57,7 @@ class SingleStepIntegrator():
         Returns:
             Stimulus:np.array - Amount of EGF at each TP."""
             
-        Stimulus = self.Stimulus_base * np.ones(self.n_TPs)
+        Stimulus = self.Stimulus_base * np.ones(self.n_TPs+1)
         start=self.Stimulus_start
         for i in range(self.Stimulus_repeats):
             stop = start + self.Stimulus_length

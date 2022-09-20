@@ -7,6 +7,9 @@ GS d- s:+ a-- C++ t 5 X R tv b+ D+ G e+++ h r++
 """
 
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm
 from ParseODE import ParseODE
 from Integrators import SingleStepIntegrator
 
@@ -17,7 +20,7 @@ StimulusInstr = [0,0.2,1000,6000,6000,14] # Stimulus train
 # Follows the scheme of [basal, strength, start, length, interpulse, repeats]
 
 StimulusParameter = "EGF" # Name of the parameter for stimulus
-n_TPs = 200000 # Amount of timepoints on which simulation is performed
+n_TPs = 2000 # Amount of timepoints on which simulation is performed
 
 cwd = os.getcwd()
 modellist = [fn[:-4] for fn in os.listdir(os.path.join(cwd, "models"))
@@ -37,16 +40,66 @@ path = os.path.join(os.path.join(cwd, "models"), model2load+".ode")
 Parsed = ParseODE(path, StimulusParameter, check=False)
 Sim = SingleStepIntegrator(Parsed.initdict, Parsed.diffeqdict, StimulusParameter, StimulusInstr, n_TPs, dt = 0.01)
 
-import matplotlib.pyplot as plt
 def TimeSeries(Variable):
+    """
+    Plots a time series of the given Variable(s) and the stimulus parameter.
+
+    Parameters
+    ----------
+    Variable : str or list
+        Determines which variable(s) to plot. Use a list of str for multiple.
+
+    Returns
+    -------
+    None.
+
+    """
     plt.figure()
-    plt.plot(Sim.valdict["t"][1:], Sim.Stimulus[StimulusParameter], "k", label = StimulusParameter)
+    plt.plot(Sim.valdict["t"][:], Sim.Stimulus[StimulusParameter], "k", label = StimulusParameter)
     if type(Variable) == list:
         for var in Variable:
             plt.plot(Sim.valdict["t"], Sim.valdict[var], label = var)
     elif type(Variable) == str:
         plt.plot(Sim.valdict["t"], Sim.valdict[Variable], label = Variable)
     plt.legend()
+
+
+def PhaseSpace2D(Xvariable, Yvariable, start = 0, end = -1, interval = 50):
+    """
+    Generates a plot of a 2D PhaseSpace trajectory.
+
+    Parameters
+    ----------
+    Xvariable : str
+        Variable to be put on the x-axis.
+    Yvariable : str
+        Variable to be put on the y-axis.
+    start : int, optional
+        Starting TP of the trajectory. The default is 0.
+    end : int, optional
+        end TP of the trajectory. The default is -1.
+    interval : int, optional
+        interval (in TPs) of dots along trajectory. The default is 50.
+
+    Returns
+    -------
+    None.
+    """
+    if end == -1:
+        end = Sim.n_TPs
+    cmap = cm.hot(np.abs(Sim.Stimulus[StimulusParameter][::interval]))
+    
+    plt.figure()
+    plt.plot(Sim.valdict[Xvariable],Sim.valdict[Yvariable], "k", lw = 1)
+    plt.scatter(Sim.valdict[Xvariable][::interval],
+                Sim.valdict[Yvariable][::interval], 
+                color = cmap, s = 8, alpha = 0.8)
+    plt.xlabel(Xvariable)
+    plt.ylabel(Yvariable)
+    plt.show()
+    
+
+
 
 #%% Plotting for non-EGFR 2 compartment
 
@@ -63,8 +116,8 @@ def TimeSeries(Variable):
 #%% Plotting for EGFR 2 compartment
 TimeSeries("EGFRp_pm")
 TimeSeries("EGFR_cyt")
+PhaseSpace2D('EGFRp_pm', 'PTPRGa_pm')
 
-import numpy as np
 EGFRtotal_pm = np.array(Sim.valdict["EGFRp_pm"])+np.array(Sim.valdict["EGFR_pm"])+np.array(Sim.valdict["EEGFRp_pm"])
 EGFRtotal = EGFRtotal_pm + np.array(Sim.valdict["EGFR_cyt"])+np.array(Sim.valdict["EGFRp_cyt"])
 plt.plot(EGFRtotal)
