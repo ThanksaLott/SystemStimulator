@@ -3,4 +3,4 @@ __pycache__/
 /models/*
 !models/TwoCompartment.ode
 
-Plots/*
+/Plots/*
